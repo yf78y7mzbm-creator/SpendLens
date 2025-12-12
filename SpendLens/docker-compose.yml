@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: spendlens_db
+    environment:
+      POSTGRES_USER: spendlens_user
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: spendlens
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spendlens_user -d spendlens"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: spendlens_api
+    environment:
+      DATABASE_URL: postgresql://spendlens_user:password123@postgres:5432/spendlens
+      NODE_ENV: development
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+    command: npm run dev
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: spendlens_network
