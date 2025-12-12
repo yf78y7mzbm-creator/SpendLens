@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { createPool } from 'pg';
+import pg from 'pg';
 import budgetRoutes from './routes/budgets.js';
 import transactionRoutes from './routes/transactions.js';
 import categoryRoutes from './routes/categories.js';
@@ -16,7 +16,7 @@ app.use(cors());
 app.use(express.json());
 
 // Database connection
-export const pool = createPool({
+export const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
 });
 

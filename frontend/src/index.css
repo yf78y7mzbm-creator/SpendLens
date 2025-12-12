@@ -1,12 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:ital@0;1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
 body {
-  @apply bg-gray-50;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: 'Space Grotesk', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography System */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  line-height: 1.3;
+}
+
+/* Serif Italic for emphasis */
+.emphasis {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  color: #ffffff;
+}
+
+/* Navigation uppercase */
+nav {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  font-weight: 500;
+}
+
+nav a {
+  color: #ffffff;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+nav a:hover {
+  opacity: 0.7;
+}
+
+/* Grid borders */
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  min-height: 100vh;
+  border-top: 1px solid #444444;
+  border-bottom: 1px solid #444444;
+}
+
+.grid-section {
+  border-right: 1px solid #444444;
+  padding: 2rem;
+}
+
+.grid-section:last-child {
+  border-right: none;
+}
+
+/* Ghost buttons */
+.btn-ghost {
+  background: transparent;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  padding: 0.75rem 2rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: #87ceeb;
+  color: #87ceeb;
+}
+
+/* Baby blue accent */
+.accent-blue {
+  color: #87ceeb;
+  border-color: #87ceeb;
+}
+
+.accent-line {
+  background-color: #87ceeb;
+  width: 2px;
+}
+
+/* Content sections */
+.section-header {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: #999999;
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive grid */
+@media (max-width: 1024px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .grid-section {
+    border-right: none;
+    border-bottom: 1px solid #444444;
+  }
+  
+  .grid-section:last-child {
+    border-bottom: none;
+  }
 }

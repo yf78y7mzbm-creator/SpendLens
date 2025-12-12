@@ -66,19 +66,19 @@ export default function PlanPhase({ userId, month }: PlanPhaseProps) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Plan Your Month</h2>
-        <p className="text-gray-600 mb-6">Set your income target, fixed expenses, and budget caps for spending categories.</p>
+    <div className="max-w-4xl">
+      <div className="border border-gray-700 p-8 bg-black">
+        <h2 className="text-3xl font-bold mb-2">Plan Your Month</h2>
+        <p className="text-gray-400 mb-8 text-sm">Set your income target, fixed expenses, and budget caps for spending categories.</p>
 
-        {error && <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded">{error}</div>}
-        {success && <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded">{success}</div>}
+        {error && <div className="mb-6 p-4 border border-red-600 bg-red-900 bg-opacity-20 text-red-400 text-sm">{error}</div>}
+        {success && <div className="mb-6 p-4 border border-blue-400 bg-blue-900 bg-opacity-20 text-blue-300 text-sm">{success}</div>}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-8">
           {/* Income & Fixed Expenses */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-8">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="text-xs uppercase tracking-widest text-gray-400 block mb-3">
                 Expected Monthly Income
               </label>
               <input
@@ -86,11 +86,11 @@ export default function PlanPhase({ userId, month }: PlanPhaseProps) {
                 value={income}
                 onChange={(e) => setIncome(e.target.value)}
                 placeholder="5000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
+                className="w-full bg-black border border-gray-600 text-white px-4 py-3 text-lg focus:border-blue-400 focus:outline-none transition"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="text-xs uppercase tracking-widest text-gray-400 block mb-3">
                 Fixed Monthly Expenses
               </label>
               <input
@@ -98,18 +98,18 @@ export default function PlanPhase({ userId, month }: PlanPhaseProps) {
                 value={fixedExpenses}
                 onChange={(e) => setFixedExpenses(e.target.value)}
                 placeholder="2000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
+                className="w-full bg-black border border-gray-600 text-white px-4 py-3 text-lg focus:border-blue-400 focus:outline-none transition"
               />
             </div>
           </div>
 
           {/* Category Budgets */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget by Category</h3>
-            <div className="space-y-3">
+          <div>
+            <h3 className="text-lg font-bold mb-6 uppercase tracking-wide">Budget by Category</h3>
+            <div className="space-y-4 border-t border-gray-700 pt-6">
               {categories.map((cat, idx) => (
-                <div key={idx} className="flex items-center gap-3">
-                  <label className="flex-1 text-sm font-medium text-gray-700 min-w-32">
+                <div key={idx} className="flex items-center justify-between pb-4 border-b border-gray-800">
+                  <label className="text-sm text-gray-300 min-w-40">
                     {cat.name}
                   </label>
                   <input
@@ -117,7 +117,7 @@ export default function PlanPhase({ userId, month }: PlanPhaseProps) {
                     value={cat.amount}
                     onChange={(e) => handleCategoryChange(idx, e.target.value)}
                     placeholder="0"
-                    className="w-24 px-3 py-2 border border-gray-300 rounded-md text-right focus:outline-none focus:ring-blue-500"
+                    className="w-32 bg-black border border-gray-600 text-white px-4 py-2 text-right focus:border-blue-400 focus:outline-none transition"
                   />
                 </div>
               ))}
@@ -125,16 +125,16 @@ export default function PlanPhase({ userId, month }: PlanPhaseProps) {
           </div>
 
           {/* Planned Surplus */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-gray-600">Planned Surplus</p>
-            <p className={`text-3xl font-bold ${plannedSurplus >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <div className="border border-blue-400 p-6 mt-8">
+            <p className="text-xs uppercase tracking-widest text-blue-300 mb-2">Planned Surplus</p>
+            <p className={`text-4xl font-bold ${plannedSurplus >= 0 ? 'text-blue-400' : 'text-red-400'}`}>
               ${plannedSurplus.toFixed(2)}
             </p>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white font-medium py-2 rounded-md hover:bg-blue-700 transition"
+            className="btn-ghost w-full mt-8 justify-center"
           >
             Save Plan
           </button>

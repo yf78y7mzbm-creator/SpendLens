@@ -11,59 +11,71 @@ function App() {
   const [currentMonth] = useState(new Date().toISOString().slice(0, 7))
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-black text-white flex flex-col">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900">SpendLens</h1>
-          <p className="text-sm text-gray-500 mt-1">Monthly Budgeting & Surplus Tracking</p>
+      <header className="border-b border-gray-700 px-8 py-6">
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight">SpendLens</h1>
+            <p className="text-xs uppercase tracking-widest text-gray-500 mt-2">Monthly Budgeting & Surplus Tracking</p>
+          </div>
+          {/* Navigation */}
+          <nav className="flex gap-6">
+            <a href="#" className="text-xs uppercase tracking-widest hover:text-blue-400 transition">Portfolio</a>
+            <a href="#" className="text-xs uppercase tracking-widest hover:text-blue-400 transition">Build</a>
+            <a href="#" className="text-xs uppercase tracking-widest hover:text-blue-400 transition">Team</a>
+            <a href="#" className="text-xs uppercase tracking-widest hover:text-blue-400 transition">Resources</a>
+          </nav>
         </div>
       </header>
 
-      {/* Navigation Tabs */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8" aria-label="Tabs">
-            <button
-              onClick={() => setCurrentPhase('plan')}
-              className={`px-1 py-4 font-medium text-sm border-b-2 ${
-                currentPhase === 'plan'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              📋 Plan
-            </button>
-            <button
-              onClick={() => setCurrentPhase('review')}
-              className={`px-1 py-4 font-medium text-sm border-b-2 ${
-                currentPhase === 'review'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              📊 Review
-            </button>
-            <button
-              onClick={() => setCurrentPhase('dashboard')}
-              className={`px-1 py-4 font-medium text-sm border-b-2 ${
-                currentPhase === 'dashboard'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              📈 Insights
-            </button>
-          </nav>
+      {/* Phase Selector */}
+      <div className="border-b border-gray-700 px-8 py-4">
+        <div className="flex gap-8">
+          <button
+            onClick={() => setCurrentPhase('plan')}
+            className={`text-xs uppercase tracking-widest font-medium pb-2 border-b-2 transition ${
+              currentPhase === 'plan'
+                ? 'border-blue-400 text-white'
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            Plan Phase
+          </button>
+          <button
+            onClick={() => setCurrentPhase('review')}
+            className={`text-xs uppercase tracking-widest font-medium pb-2 border-b-2 transition ${
+              currentPhase === 'review'
+                ? 'border-blue-400 text-white'
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            Review Phase
+          </button>
+          <button
+            onClick={() => setCurrentPhase('dashboard')}
+            className={`text-xs uppercase tracking-widest font-medium pb-2 border-b-2 transition ${
+              currentPhase === 'dashboard'
+                ? 'border-blue-400 text-white'
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            Insights
+          </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <main className="flex-1 px-8 py-8 overflow-y-auto">
         {currentPhase === 'plan' && <PlanPhase userId={userId} month={currentMonth} />}
         {currentPhase === 'review' && <ReviewPhase userId={userId} month={currentMonth} />}
         {currentPhase === 'dashboard' && <DashboardPhase userId={userId} month={currentMonth} />}
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-700 px-8 py-6">
+        <p className="text-xs text-gray-500 uppercase tracking-widest">© 2025 SpendLens. All rights reserved.</p>
+      </footer>
     </div>
   )
 }

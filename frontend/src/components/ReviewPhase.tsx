@@ -67,31 +67,31 @@ export default function ReviewPhase({ userId, month }: ReviewPhaseProps) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl">
       {/* CSV Upload Section */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Monthly Review</h2>
-        <p className="text-gray-600 mb-6">Upload your bank statement CSV to review and categorize transactions.</p>
+      <div className="border border-gray-700 p-8 bg-black mb-8">
+        <h2 className="text-3xl font-bold mb-2">Monthly Review</h2>
+        <p className="text-gray-400 mb-8 text-sm">Upload your bank statement CSV to review and categorize transactions.</p>
 
-        {error && <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded">{error}</div>}
-        {success && <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded">{success}</div>}
+        {error && <div className="mb-6 p-4 border border-red-600 bg-red-900 bg-opacity-20 text-red-400 text-sm">{error}</div>}
+        {success && <div className="mb-6 p-4 border border-blue-400 bg-blue-900 bg-opacity-20 text-blue-300 text-sm">{success}</div>}
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-6">
+          <label className="text-xs uppercase tracking-widest text-gray-400 block mb-3">
             Paste CSV Data (Date, Merchant, Amount)
           </label>
           <textarea
             value={csvData}
             onChange={(e) => setCsvData(e.target.value)}
             placeholder="2024-12-01,Whole Foods,45.99&#10;2024-12-02,Uber,28.50"
-            className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md font-mono text-sm focus:outline-none focus:ring-blue-500"
+            className="w-full h-32 px-4 py-3 border border-gray-600 bg-black text-white font-mono text-sm focus:border-blue-400 focus:outline-none transition"
           />
         </div>
 
         <button
           onClick={handleCSVUpload}
           disabled={loading}
-          className="bg-blue-600 text-white font-medium px-4 py-2 rounded-md hover:bg-blue-700 transition disabled:opacity-50"
+          className="btn-ghost disabled:opacity-50"
         >
           {loading ? 'Uploading...' : 'Upload Transactions'}
         </button>
@@ -99,34 +99,34 @@ export default function ReviewPhase({ userId, month }: ReviewPhaseProps) {
 
       {/* Transactions List */}
       {transactions.length > 0 && (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
+        <div className="border border-gray-700 overflow-hidden bg-black">
+          <div className="px-8 py-6 border-b border-gray-700">
+            <h3 className="text-lg font-bold uppercase tracking-wide">
               Transactions for {month}
             </h3>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+            <table className="w-full text-sm">
+              <thead className="border-b border-gray-700 bg-black">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Date</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Merchant</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Category</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Type</th>
+                  <th className="px-8 py-4 text-left text-xs font-bold uppercase tracking-widest text-gray-400">Date</th>
+                  <th className="px-8 py-4 text-left text-xs font-bold uppercase tracking-widest text-gray-400">Merchant</th>
+                  <th className="px-8 py-4 text-left text-xs font-bold uppercase tracking-widest text-gray-400">Amount</th>
+                  <th className="px-8 py-4 text-left text-xs font-bold uppercase tracking-widest text-gray-400">Category</th>
+                  <th className="px-8 py-4 text-left text-xs font-bold uppercase tracking-widest text-gray-400">Type</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-800">
                 {transactions.map((txn) => (
-                  <tr key={txn.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                  <tr key={txn.id} className="hover:bg-gray-900 transition">
+                    <td className="px-8 py-4 text-sm text-gray-200">
                       {new Date(txn.date).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{txn.merchant}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                    <td className="px-8 py-4 text-sm text-gray-200">{txn.merchant}</td>
+                    <td className="px-8 py-4 text-sm font-medium text-blue-400">
                       ${txn.amount.toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-8 py-4 text-sm">
                       <select
                         value={txn.category_id || ''}
                         onChange={(e) =>
@@ -134,7 +134,7 @@ export default function ReviewPhase({ userId, month }: ReviewPhaseProps) {
                             category_id: e.target.value || null,
                           })
                         }
-                        className="px-2 py-1 border border-gray-300 rounded text-sm"
+                        className="px-3 py-1 border border-gray-600 bg-black text-white text-sm focus:border-blue-400 focus:outline-none"
                       >
                         <option value="">Uncategorized</option>
                         {categories.map((cat) => (
@@ -144,7 +144,7 @@ export default function ReviewPhase({ userId, month }: ReviewPhaseProps) {
                         ))}
                       </select>
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-8 py-4 text-sm">
                       <select
                         value={txn.is_one_off ? 'one_off' : 'recurring'}
                         onChange={(e) =>
@@ -153,7 +153,7 @@ export default function ReviewPhase({ userId, month }: ReviewPhaseProps) {
                             is_recurring: e.target.value === 'recurring',
                           })
                         }
-                        className="px-2 py-1 border border-gray-300 rounded text-sm"
+                        className="px-3 py-1 border border-gray-600 bg-black text-white text-sm focus:border-blue-400 focus:outline-none"
                       >
                         <option value="recurring">Recurring</option>
                         <option value="one_off">One-Off</option>
