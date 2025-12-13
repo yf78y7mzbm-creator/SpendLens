@@ -4,6 +4,7 @@ import ReviewPhase from './components/ReviewPhase'
 import DashboardPhase from './components/DashboardPhase'
 
 export type Phase = 'plan' | 'review' | 'dashboard'
+// High-tech architectural design version 1.0
 
 function App() {
   const [currentPhase, setCurrentPhase] = useState<Phase>('plan')
