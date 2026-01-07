@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { api } from '../services/api'
+import InvestmentProjectionChart from './InvestmentProjectionChart'
 
 interface DashboardPhaseProps {
-  userId: string
   month: string
 }
 
-export default function DashboardPhase({ userId, month }: DashboardPhaseProps) {
+export default function DashboardPhase({ month }: DashboardPhaseProps) {
   const [budget, setBudget] = useState<any>(null)
   const [transactions, setTransactions] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>([])
@@ -17,8 +17,8 @@ export default function DashboardPhase({ userId, month }: DashboardPhaseProps) {
     const loadData = async () => {
       try {
         const [budgetRes, txnRes, catRes] = await Promise.all([
-          api.getBudget(userId, month),
-          api.getTransactions(userId, month),
+          api.getBudget(month),
+          api.getTransactions(month),
           api.getCategories(),
         ])
 
@@ -33,7 +33,7 @@ export default function DashboardPhase({ userId, month }: DashboardPhaseProps) {
     }
 
     loadData()
-  }, [userId, month])
+  }, [month])
 
   if (loading) {
     return <div className="text-center text-gray-400 text-sm uppercase tracking-widest">Loading...</div>
@@ -51,33 +51,33 @@ export default function DashboardPhase({ userId, month }: DashboardPhaseProps) {
     )
   }
 
-  // Calculate actuals
+  // Calculate actuals (positive = expenses, negative = income)
   const actualIncome = transactions
-    .filter(t => t.amount > 0)
-    .reduce((sum, t) => sum + t.amount, 0)
-
-  const actualExpenses = transactions
     .filter(t => t.amount < 0)
     .reduce((sum, t) => sum + Math.abs(t.amount), 0)
 
+  const actualExpenses = transactions
+    .filter(t => t.amount > 0)
+    .reduce((sum, t) => sum + t.amount, 0)
+
   const actualSurplus = actualIncome - actualExpenses
 
-  // Category breakdown
+  // Category breakdown (expenses are positive amounts)
   const categorySpending = categories.map((cat) => {
     const spending = transactions
-      .filter(t => t.category_id === cat.id && t.amount < 0)
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+      .filter(t => t.category_id === cat.id && t.amount > 0)
+      .reduce((sum, t) => sum + t.amount, 0)
     return { ...cat, actual: spending }
   })
 
-  // One-off vs recurring
+  // One-off vs recurring (expenses are positive amounts)
   const oneOffAmount = transactions
-    .filter(t => t.is_one_off && t.amount < 0)
-    .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+    .filter(t => t.is_one_off && t.amount > 0)
+    .reduce((sum, t) => sum + t.amount, 0)
 
   const recurringAmount = transactions
-    .filter(t => t.is_recurring && t.amount < 0)
-    .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+    .filter(t => t.is_recurring && t.amount > 0)
+    .reduce((sum, t) => sum + t.amount, 0)
 
   const normalizedExpenses = actualExpenses - oneOffAmount
 
@@ -170,6 +170,9 @@ export default function DashboardPhase({ userId, month }: DashboardPhaseProps) {
           </div>
         </div>
       )}
+
+      {/* Investment Projection */}
+      <InvestmentProjectionChart monthlySurplus={actualSurplus} />
     </div>
   )
 }

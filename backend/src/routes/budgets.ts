@@ -1,27 +1,32 @@
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { pool } from '../index.js';
-import { Budget } from '../models/index.js';
+import { authenticateToken, AuthRequest } from '../middleware/auth.js';
 
 const router = Router();
 
 // Create a budget for a month
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const { user_id, month, planned_income, planned_fixed_expenses, categories } = req.body;
+    const user_id = req.user!.id;
+    const { month, planned_income, planned_fixed_expenses, categories } = req.body;
 
     const planned_surplus = planned_income - planned_fixed_expenses;
 
     const result = await pool.query(
       `INSERT INTO budgets (user_id, month, planned_income, planned_fixed_expenses, planned_surplus)
        VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (user_id, month)
+       DO UPDATE SET planned_income = $3, planned_fixed_expenses = $4, planned_surplus = $5, updated_at = NOW()
        RETURNING *`,
       [user_id, month, planned_income, planned_fixed_expenses, planned_surplus]
     );
 
     const budget = result.rows[0];
 
-    // Add category budgets
+    // Clear existing category budgets and add new ones
     if (categories && Array.isArray(categories)) {
+      await pool.query('DELETE FROM budget_categories WHERE budget_id = $1', [budget.id]);
+
       for (const cat of categories) {
         await pool.query(
           `INSERT INTO budget_categories (budget_id, category_id, planned_amount)
@@ -38,9 +43,10 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 // Get budget for a month
-router.get('/:user_id/:month', async (req: Request, res: Response) => {
+router.get('/:month', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const { user_id, month } = req.params;
+    const user_id = req.user!.id;
+    const { month } = req.params;
 
     const result = await pool.query(
       `SELECT * FROM budgets WHERE user_id = $1 AND month = $2`,

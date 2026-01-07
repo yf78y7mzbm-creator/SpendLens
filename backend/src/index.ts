@@ -5,6 +5,8 @@ import pg from 'pg';
 import budgetRoutes from './routes/budgets.js';
 import transactionRoutes from './routes/transactions.js';
 import categoryRoutes from './routes/categories.js';
+import authRoutes from './routes/auth.js';
+import debtRoutes from './routes/debts.js';
 
 dotenv.config();
 
@@ -31,6 +33,8 @@ export async function initializeDatabase() {
       CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255),
+        name VARCHAR(255),
         created_at TIMESTAMP DEFAULT NOW()
       );
 
@@ -79,6 +83,29 @@ export async function initializeDatabase() {
       CREATE INDEX IF NOT EXISTS idx_transactions_user_date ON transactions(user_id, date);
       CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category_id);
       CREATE INDEX IF NOT EXISTS idx_budgets_user_month ON budgets(user_id, month);
+
+      CREATE TABLE IF NOT EXISTS debts (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id),
+        name VARCHAR(255) NOT NULL,
+        balance DECIMAL(12, 2) NOT NULL,
+        interest_rate DECIMAL(5, 2) DEFAULT 0,
+        min_payment DECIMAL(12, 2) NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS debt_plans (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id),
+        strategy VARCHAR(20) NOT NULL,
+        monthly_payment DECIMAL(12, 2) NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(user_id)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_debts_user ON debts(user_id);
     `);
     console.log('Database initialized successfully');
   } catch (error) {
@@ -94,9 +121,11 @@ initializeDatabase().catch(err => {
 });
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/budgets', budgetRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/debts', debtRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

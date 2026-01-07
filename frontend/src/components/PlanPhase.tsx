@@ -1,29 +1,68 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { api } from '../services/api'
 
 interface PlanPhaseProps {
-  userId: string
   month: string
 }
 
-export default function PlanPhase({ userId, month }: PlanPhaseProps) {
+const DEFAULT_CATEGORIES = [
+  'Food & Dining',
+  'Travel',
+  'Entertainment',
+  'Shopping',
+  'Utilities',
+  'Health & Fitness',
+  'Subscriptions',
+]
+
+export default function PlanPhase({ month }: PlanPhaseProps) {
   const [income, setIncome] = useState('')
   const [fixedExpenses, setFixedExpenses] = useState('')
-  const [categories, setCategories] = useState([
-    { name: 'Food & Dining', amount: '' },
-    { name: 'Travel', amount: '' },
-    { name: 'Entertainment', amount: '' },
-    { name: 'Shopping', amount: '' },
-    { name: 'Utilities', amount: '' },
-    { name: 'Health & Fitness', amount: '' },
-    { name: 'Subscriptions', amount: '' },
-  ])
+  const [categories, setCategories] = useState(
+    DEFAULT_CATEGORIES.map(name => ({ name, amount: '' }))
+  )
+  const [debtPayment, setDebtPayment] = useState<number | null>(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  // Load existing budget data
+  useEffect(() => {
+    const loadBudget = async () => {
+      try {
+        const res = await api.getBudget(month)
+        if (res.data) {
+          setIncome(res.data.planned_income?.toString() || '')
+          setFixedExpenses(res.data.planned_fixed_expenses?.toString() || '')
+
+          // Map existing categories to form state
+          const existingCategories = res.data.categories || []
+          const updatedCategories = DEFAULT_CATEGORIES.map(name => {
+            const existing = existingCategories.find((c: any) => c.name === name)
+            return { name, amount: existing?.planned_amount?.toString() || '' }
+          })
+          setCategories(updatedCategories)
+
+          // Check for debt payment category
+          const debtCat = existingCategories.find((c: any) => c.name === 'Debt Payments')
+          if (debtCat) {
+            setDebtPayment(debtCat.planned_amount)
+          }
+        }
+      } catch (err) {
+        // No existing budget, that's fine
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadBudget()
+  }, [month])
 
   const plannedSurplus =
-    (parseFloat(income) || 0) - (parseFloat(fixedExpenses) || 0) - 
-    categories.reduce((sum, cat) => sum + (parseFloat(cat.amount) || 0), 0)
+    (parseFloat(income) || 0) - (parseFloat(fixedExpenses) || 0) -
+    categories.reduce((sum, cat) => sum + (parseFloat(cat.amount) || 0), 0) -
+    (debtPayment || 0)
 
   const handleCategoryChange = (index: number, value: string) => {
     const newCategories = [...categories]
@@ -45,17 +84,27 @@ export default function PlanPhase({ userId, month }: PlanPhaseProps) {
         return
       }
 
+      // Build categories array, preserving debt payment if it exists
+      const budgetCategories = categories
+        .filter(c => c.amount)
+        .map(c => ({
+          name: c.name,
+          planned_amount: parseFloat(c.amount),
+        }))
+
+      // Preserve the Debt Payments category if it was set from DebtPhase
+      if (debtPayment !== null) {
+        budgetCategories.push({
+          name: 'Debt Payments',
+          planned_amount: debtPayment,
+        })
+      }
+
       await api.createBudget({
-        user_id: userId,
         month,
         planned_income: incomeNum,
         planned_fixed_expenses: fixedNum,
-        categories: categories
-          .filter(c => c.amount)
-          .map(c => ({
-            name: c.name,
-            planned_amount: parseFloat(c.amount),
-          })),
+        categories: budgetCategories,
       })
 
       setSuccess('Budget created successfully!')
@@ -65,8 +114,12 @@ export default function PlanPhase({ userId, month }: PlanPhaseProps) {
     }
   }
 
+  if (loading) {
+    return <div className="text-center text-gray-400 text-sm uppercase tracking-widest">Loading...</div>
+  }
+
   return (
-    <div className="max-w-4xl">
+    <div>
       <div className="border border-gray-700 p-8 bg-black">
         <h2 className="text-3xl font-bold mb-2">Plan Your Month</h2>
         <p className="text-gray-400 mb-8 text-sm">Set your income target, fixed expenses, and budget caps for spending categories.</p>
@@ -121,6 +174,17 @@ export default function PlanPhase({ userId, month }: PlanPhaseProps) {
                   />
                 </div>
               ))}
+              {debtPayment !== null && (
+                <div className="flex items-center justify-between pb-4 border-b border-gray-800">
+                  <label className="text-sm text-red-400 min-w-40">
+                    Debt Payments
+                    <span className="text-xs text-gray-500 ml-2">(from Debt Planner)</span>
+                  </label>
+                  <span className="w-32 text-right text-red-400 font-medium px-4 py-2">
+                    ${debtPayment.toFixed(2)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
